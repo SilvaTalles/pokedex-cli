@@ -1,16 +1,50 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"os"
 	"strings"
+
+	"github.com/SilvaTalles/pokedex-cli/internal/pokeapi"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
-var commandRegistry map[string]cliCommand
+type config struct {
+	commandList     map[string]cliCommand
+	pokeapiClient   pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
+}
+
+func startRepl(cfg *config) {
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("Pokedex > ")
+		scanner.Scan()
+		input := scanner.Text()
+		words := cleanInput(input)
+		firstWord := words[0]
+
+		command, exists := cfg.commandList[firstWord]
+		if !exists {
+			fmt.Println("Unknown command")
+			continue
+		}
+		if err := command.callback(cfg); err != nil {
+			fmt.Println("Error: ", err)
+		}
+
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Invalid input %s", err)
+		}
+	}
+}
 
 func getRegistry() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -23,6 +57,16 @@ func getRegistry() map[string]cliCommand {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Displays the next 20 map locations in the Pokemon world",
+			callback:    commandMapf,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the previous 20 map locations in the Pokemon world",
+			callback:    commandMapb,
 		},
 	}
 }
