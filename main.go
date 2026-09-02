@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	commandRegistry = getRegistry()
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -14,7 +15,15 @@ func main() {
 		input := scanner.Text()
 		words := cleanInput(input)
 		firstWord := words[0]
-		fmt.Printf("Your command was: %v\n", firstWord)
+
+		command, exits := commandRegistry[firstWord]
+		if !exits {
+			fmt.Println("Unknown command")
+			continue
+		}
+		if err := command.callback(); err != nil {
+			fmt.Println("Error: ", err)
+		}
 
 		if err := scanner.Err(); err != nil {
 			fmt.Printf("Invalid input %s", err)
