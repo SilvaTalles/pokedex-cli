@@ -1,1 +1,8 @@
+# executables
 pokedex-cli
+
+#tests
+*test.go
+
+# logs
+*.log

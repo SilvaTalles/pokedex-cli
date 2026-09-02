@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -16,6 +15,5 @@ func cleanInput(text string) []string {
 		i = strings.Index(text, " ")
 	}
 	result = append(result, text)
-	fmt.Println(result)
 	return result
 }
