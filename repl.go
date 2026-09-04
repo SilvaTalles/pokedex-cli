@@ -79,6 +79,16 @@ func getRegistry() map[string]cliCommand {
 			description: "Displays all the pokemons in the given area",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Catches a pokemon",
+			callback:    commandCatch,
+		},
+		"open": {
+			name:        "open",
+			description: "Open the Pokedex for cought pokemons",
+			callback:    commandOpen,
+		},
 	}
 }
 
