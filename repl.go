@@ -89,6 +89,11 @@ func getRegistry() map[string]cliCommand {
 			description: "Open the Pokedex for cought pokemons",
 			callback:    commandOpen,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect your pokemon stats",
+			callback:    commandInspect,
+		},
 	}
 }
 

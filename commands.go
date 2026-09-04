@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"slices"
 )
 
 func commandExit(cfg *config, arg string) error {
@@ -94,10 +95,40 @@ func commandCatch(cfg *config, arg string) error {
 func commandOpen(cfg *config, arg string) error {
 	list := cfg.pokeapiClient.GetPokedexList()
 	if len(list) == 0 {
-		fmt.Println("You don't have caught any Pokemon yet!")
+		fmt.Println("You don't have any Pokemon yet!")
 	}
 	for _, poke := range list {
 		fmt.Println("-", poke)
 	}
+	return nil
+}
+
+func commandInspect(cfg *config, arg string) error {
+	infoResp, err := cfg.pokeapiClient.GetPokemonInfo(arg)
+	if err != nil {
+		return err
+	}
+
+	list := cfg.pokeapiClient.GetPokedexList()
+	if !slices.Contains(list, arg) {
+		fmt.Println("You haven't caught this Pokemon")
+		return nil
+	}
+
+	fmt.Println("#Name:", infoResp.Name)
+	fmt.Println("#Height:", infoResp.Height)
+	fmt.Println("#Weight:", infoResp.Weight)
+	fmt.Println("#Stats:")
+	fmt.Println("   -hp:", infoResp.Stats[0].BaseStat)
+	fmt.Println("   -attack:", infoResp.Stats[1].BaseStat)
+	fmt.Println("   -defense:", infoResp.Stats[2].BaseStat)
+	fmt.Println("   -special-attack:", infoResp.Stats[3].BaseStat)
+	fmt.Println("   -special-defense:", infoResp.Stats[4].BaseStat)
+	fmt.Println("   -speed", infoResp.Stats[5].BaseStat)
+	fmt.Println("#Types:")
+	for _, pokeType := range infoResp.Types {
+		fmt.Println("   -", pokeType.Type.Name)
+	}
+
 	return nil
 }
