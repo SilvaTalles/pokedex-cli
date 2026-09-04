@@ -7,13 +7,12 @@ import (
 	"strings"
 
 	"github.com/SilvaTalles/pokedex-cli/internal/pokeapi"
-	"github.com/SilvaTalles/pokedex-cli/internal/pokecache"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 type config struct {
@@ -21,7 +20,6 @@ type config struct {
 	pokeapiClient   pokeapi.Client
 	nextLocationURL *string
 	prevLocationURL *string
-	pokeCache       *pokecache.Cache
 }
 
 func startRepl(cfg *config) {
@@ -33,12 +31,18 @@ func startRepl(cfg *config) {
 		words := cleanInput(input)
 		firstWord := words[0]
 
+		// getting the arg if exists
+		arg := ""
+		if len(words) > 1 {
+			arg = words[1]
+		}
+
 		command, exists := cfg.commandList[firstWord]
 		if !exists {
 			fmt.Println("Unknown command")
 			continue
 		}
-		if err := command.callback(cfg); err != nil {
+		if err := command.callback(cfg, arg); err != nil {
 			fmt.Println("Error: ", err)
 		}
 
@@ -69,6 +73,11 @@ func getRegistry() map[string]cliCommand {
 			name:        "mapb",
 			description: "Displays the previous 20 map locations in the Pokemon world",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Displays all the pokemons in the given area",
+			callback:    commandExplore,
 		},
 	}
 }

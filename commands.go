@@ -6,13 +6,13 @@ import (
 	"os"
 )
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, arg string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(cfg *config) error {
+func commandHelp(cfg *config, arg string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -23,7 +23,7 @@ func commandHelp(cfg *config) error {
 	return nil
 }
 
-func commandMapf(cfg *config) error {
+func commandMapf(cfg *config, arg string) error {
 	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationURL)
 	if err != nil {
 		return err
@@ -33,12 +33,12 @@ func commandMapf(cfg *config) error {
 	cfg.prevLocationURL = locationResp.Previous
 
 	for _, loc := range locationResp.Results {
-		fmt.Println(loc.Name)
+		fmt.Println("-", loc.Name)
 	}
 	return nil
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, arg string) error {
 	if cfg.prevLocationURL == nil {
 		return errors.New("you're on the first page")
 	}
@@ -52,7 +52,20 @@ func commandMapb(cfg *config) error {
 	cfg.prevLocationURL = locationResp.Previous
 
 	for _, loc := range locationResp.Results {
-		fmt.Println(loc.Name)
+		fmt.Println("-", loc.Name)
+	}
+	return nil
+}
+
+func commandExplore(cfg *config, arg string) error {
+	pokemonResp, err := cfg.pokeapiClient.ListPokemon(arg)
+	if err != nil {
+		return err
+	}
+	fmt.Println("==== Exploring", arg, "====")
+
+	for _, poke := range pokemonResp.PokemonEncounters {
+		fmt.Println("-", poke.Pokemon.Name)
 	}
 	return nil
 }
